@@ -14,7 +14,7 @@ to be an unnecessary complication in the context of editable installation.
 Installation
 ------------
 
-:: code-block::
+.. code-block::
 
     python -m pip install git+https://github.com/layday/frontend-editables
 
