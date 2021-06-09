@@ -122,13 +122,11 @@ class SymlinkInstaller(
         paths = self.editable_metadata["paths"]
 
         if strategy is EditableStrategy.lax:
-            top_level_packages = uniq(starmap(_find_outermost_entity, paths.items()))
-            top_level_paths = [
-                Path(self.output_directory, t) for t, _ in top_level_packages
-            ]
-            for target_path, (_, source) in zip(top_level_paths, top_level_packages):
+            outermost_entities = uniq(starmap(_find_outermost_entity, paths.items()))
+            outermost_paths = [Path(self.output_directory, t) for t, _ in outermost_entities]
+            for target_path, (_, source) in zip(outermost_paths, outermost_entities):
                 os.symlink(source, target_path)
-            return top_level_paths
+            return outermost_paths
 
         elif strategy is EditableStrategy.strict:
             materialized_paths = {
