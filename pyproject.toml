@@ -1,0 +1,43 @@
+[build-system]
+requires = ["flit_core >=3.2.0"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "frontend_editables"
+version = "0.1.0"
+description = "A library for installing distributions in editable mode."
+readme = "README.rst"
+requires-python = ">=3.6"
+license = { file = "COPYING" }
+authors = [
+  { name = "layday", email = "layday@protonmail.com" },
+]
+dependencies = [
+  "typing-extensions",
+]
+
+[project.optional-dependencies]
+test = [
+  "coverage[toml]",
+  "pytest",
+]
+
+[project.urls]
+homepage = "https://github.com/layday/frontend-editables"
+# documentation = "readthedocs.org"
+repository = "https://github.com/layday/frontend-editables"
+# changelog = "github.com/me/spam/blob/master/CHANGELOG.md"
+
+
+[tool.coverage.run]
+source = ["frontend_editables"]
+branch = true
+
+
+[tool.pyright]
+include = ["src"]
+strict = true
+
+
+[tool.black]
+line_length = 99
