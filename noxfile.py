@@ -11,4 +11,4 @@ def test(session: nox.Session):
 @nox.session
 def type_check(session: nox.Session):
     session.install(".")
-    session.run("npx", "-y", "pyright", external=True)
+    session.run("npx", "pyright", external=True)
