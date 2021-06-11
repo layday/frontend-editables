@@ -11,6 +11,10 @@ LAYOUTS = {
     "single-module": {
         "foo.py": "foo.py",
     },
+    "single-package-multiple-modules": {
+        "foo/__init__.py": os.path.join("foo", "__init__.py"),
+        "foo/bar.py": os.path.join("foo", "bar.py"),
+    },
     "mixed-module-and-package": {
         "foo.py": "foo.py",
         "bar/__init__.py": os.path.join("bar", "__init__.py"),
@@ -25,20 +29,25 @@ LAYOUTS = {
     },
     "multiple-nested-package": {
         "foo/__init__.py": os.path.join("src", "foo", "__init__.py"),
+        "bar/__init__.py": os.path.join("src", "bar", "__init__.py"),
         "bar/baz/__init__.py": os.path.join("src", "bar", "baz", "__init__.py"),
     },
-    "mixed-module-and-package": {
+    "mixed-indirect-module-and-package": {
         "foo.py": os.path.join("src", "foo.py"),
         "bar/__init__.py": os.path.join("bar", "__init__.py"),
+    },
+    "namespace-package-only": {
+        "foo/bar/__init__.py": os.path.join("foo", "bar", "__init__.py"),
     },
 }
 
 
 @pytest.fixture(params=LAYOUTS.values(), ids=LAYOUTS.keys())
 def dummy_paths(request, tmp_path):
-    input_ = tmp_path / "input"
-    input_.mkdir()
-    paths = {t: os.path.join(input_, s) for t, s in request.param.items()}
+    input_directory = tmp_path / "in"
+    input_directory.mkdir()
+
+    paths = {t: os.path.join(input_directory, s) for t, s in request.param.items()}
     for source in paths.values():
         os.makedirs(os.path.dirname(source), exist_ok=True)
         with open(source, "wb"):
