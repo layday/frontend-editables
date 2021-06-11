@@ -77,7 +77,9 @@ class BaseEditableInstaller:
         self._strategy = strategy
 
     @classmethod
-    def is_installation_mode_supported(cls) -> bool:  # pragma: no cover
+    def is_installation_method_supported(
+        cls, output_directory: "os.PathLike[str] | str"
+    ) -> bool:  # pragma: no cover
         raise NotImplementedError
 
     def install(self) -> "list[Path]":  # pragma: no cover
@@ -100,20 +102,15 @@ class SymlinkInstaller(
 ):
     @classmethod
     @lru_cache()
-    def is_installation_mode_supported(cls) -> bool:
-        if not hasattr(os, "symlink"):
-            return False
-
+    def is_installation_method_supported(cls, output_directory: "os.PathLike[str] | str") -> bool:
         with tempfile.TemporaryDirectory(
-            prefix="test-frontend-editables-symlinking"
-        ) as temp_dir_name:
-            foo = os.path.join(temp_dir_name, "foo")
-            with open(foo, "wb"):
-                pass
+            prefix="_test-frontend-editables-symlinking",
+            dir=output_directory,
+        ) as tempdir:
             try:
-                os.symlink(foo, os.path.join(temp_dir_name, "bar"))
+                os.symlink(os.path.join(tempdir, "foo"), os.path.join(tempdir, "bar"))
                 return True
-            except OSError:
+            except (AttributeError, NotImplementedError, OSError):
                 return False
 
     def install(self) -> "list[Path]":
@@ -147,7 +144,7 @@ class PthFileInstaller(
     supported_strategies=frozenset({EditableStrategy.lax}),
 ):
     @classmethod
-    def is_installation_mode_supported(cls) -> bool:
+    def is_installation_method_supported(cls, output_directory: "os.PathLike[str] | str") -> bool:
         return True
 
     def install(self) -> "list[Path]":
@@ -173,7 +170,8 @@ def install(
     candidates = (
         c
         for c in ([installer_cls] if installer_cls is not None else BaseEditableInstaller.registry)
-        if strategy in c.supported_strategies and c.is_installation_mode_supported()
+        if strategy in c.supported_strategies
+        and c.is_installation_method_supported(output_directory)
     )
     installer_cls = next(candidates, None)
     if installer_cls is None:
