@@ -142,15 +142,12 @@ class SymlinkInstaller(
 
         elif strategy is EditableStrategy.strict:
             packages = uniq(
-                self.output_directory / d
-                for t in paths
-                for d in (posixpath.dirname(t),)
-                if d
+                self.output_directory / d for t in paths for d in (posixpath.dirname(t),) if d
             )
             for package_path in packages:
                 os.makedirs(package_path, exist_ok=True)
 
-            all_files = [self.output_directory / t for t, _ in paths.items()]
+            all_files = [self.output_directory / t for t in paths]
             for target_path, source in zip(all_files, paths.values()):
                 os.symlink(source, target_path)
 
@@ -185,7 +182,10 @@ class RedirectorInstaller(
         editables_path.write_bytes(self.redirector)
         pth_file_path = self.output_directory / f"{base_name}.pth"
         pth_file_path.write_text(
-            f"import {base_name}; " f"{base_name}.install_redirector({specs_to_absolute_paths})",
+            # fmt: off
+            f"import {base_name}; "
+            f"{base_name}.install_redirector({specs_to_absolute_paths})",
+            # fmt: on
             encoding="utf-8",
         )
         return [editables_path, pth_file_path]
