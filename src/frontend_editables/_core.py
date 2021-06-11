@@ -204,7 +204,7 @@ class PthFileInstaller(
     priority=20,
 ):
     @classmethod
-    def is_installation_method_supported(cls, output_directory: "os.PathLike[str] | str") -> bool:
+    def is_installation_method_supported(cls, output_directory: _PathOrStr) -> bool:
         return True
 
     def install(self) -> "list[Path]":
@@ -224,7 +224,7 @@ def install(
     strategy: EditableStrategy,
     installer_cls: "type[BaseEditableInstaller] | None" = None,
     *,
-    append_to_record: "os.PathLike[str] | str | None" = None,
+    append_to_record: "_PathOrStr | None" = None,
 ) -> "list[Path]":
     """Perform an editable installation and return the list of installed files."""
     candidates = (
