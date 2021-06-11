@@ -31,6 +31,7 @@ changelog = "https://github.com/layday/frontend-editables/blob/main/CHANGELOG.rs
 
 [tool.coverage.run]
 source = ["frontend_editables"]
+omit = ["**/frontend_editables/_redirector.py"]
 branch = true
 
 
