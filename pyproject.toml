@@ -26,7 +26,7 @@ test = [
 homepage = "https://github.com/layday/frontend-editables"
 # documentation = "readthedocs.org"
 repository = "https://github.com/layday/frontend-editables"
-# changelog = "github.com/me/spam/blob/master/CHANGELOG.md"
+changelog = "https://github.com/layday/frontend-editables/blob/main/CHANGELOG.rst"
 
 
 [tool.coverage.run]
