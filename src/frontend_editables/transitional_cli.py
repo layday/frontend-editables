@@ -128,7 +128,7 @@ def _pip_info_json() -> "list[dict[str, str]]":
     )
 
 
-def main() -> None:
+def main(args: "Sequence[str] | None" = None) -> None:
     parser = argparse.ArgumentParser(
         description="Wacky transitional editable project installer.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -150,9 +150,9 @@ def main() -> None:
         help="editable strategy to follow",
         type=EditableStrategy,
     )
-    args = parser.parse_args()
+    parsed_args = parser.parse_args(args)
 
-    path_pairs = _slice_pairs(args.path_pairs)
+    path_pairs = _slice_pairs(parsed_args.path_pairs)
     paths = dict(
         p
         for f, t in path_pairs
@@ -160,13 +160,15 @@ def main() -> None:
     )
     editable_metadata = EditableDistributionMetadata(paths=paths)
 
-    if args.method is not None:
-        installer_cls = next(i for i in BaseEditableInstaller.registry if i.label == args.method)
+    if parsed_args.method is not None:
+        installer_cls = next(
+            i for i in BaseEditableInstaller.registry if i.label == parsed_args.method
+        )
     else:
         installer_cls = None
 
     with tempfile.TemporaryDirectory() as tempdir:
-        wheel_path = _pip_build_wheel(tempdir)
+        wheel_path = _pip_build_wheel(tempdir, parsed_args.spec)
         _rebuild_wheel(tempdir, wheel_path)
         _pip_install_wheel(wheel_path)
         pip_info = _pip_info_json()
@@ -176,7 +178,7 @@ def main() -> None:
         install(
             package["location"],
             editable_metadata,
-            args.strategy,
+            parsed_args.strategy,
             installer_cls,
             append_to_record=os.path.join(
                 package["location"], f"{distribution}-{package['version']}.dist-info", "RECORD"
