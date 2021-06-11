@@ -5,6 +5,7 @@ from itertools import starmap
 import os
 import os.path
 from pathlib import Path
+import pkgutil
 import posixpath
 import tempfile
 
@@ -48,6 +49,17 @@ def _find_parent_folder(target: str, source: str) -> str:
     return os.path.dirname(source)
 
 
+def _normalise_package_path(source: str) -> str:
+    if os.path.isdir(source):
+        source = os.path.join(source, "__init__.py")
+        if not os.path.isfile(source):
+            raise InstallerOperationError(
+                "Implicit namespace packages are not supported by the redirector installer.",
+                source,
+            )
+    return source
+
+
 class BaseEditableInstaller:
     registry: Final["list[type[BaseEditableInstaller]]"] = []
     supported_strategies: "Set[EditableStrategy]"
@@ -63,7 +75,7 @@ class BaseEditableInstaller:
         self.strategy = strategy
 
     def __init_subclass__(
-        cls, priority: int, supported_strategies: "Set[EditableStrategy]"
+        cls, supported_strategies: "Set[EditableStrategy]", priority: int
     ) -> None:
         cls.registry.insert(priority, cls)
         cls.supported_strategies = supported_strategies
@@ -99,8 +111,8 @@ class BaseEditableInstaller:
 
 class SymlinkInstaller(
     BaseEditableInstaller,
-    priority=0,
     supported_strategies=frozenset({EditableStrategy.lax, EditableStrategy.strict}),
+    priority=0,
 ):
     @classmethod
     @lru_cache()
@@ -142,10 +154,47 @@ class SymlinkInstaller(
             for target_path, source in zip(all_files, paths.values()):
                 os.symlink(source, target_path)
 
+            return all_files
+
+
+class RedirectorInstaller(
+    BaseEditableInstaller,
+    supported_strategies=frozenset({EditableStrategy.lax}),
+    priority=10,
+):
+    redirector = pkgutil.get_data(__package__, "_redirector.py")
+
+    @classmethod
+    def is_installation_method_supported(cls, output_directory: _PathOrStr) -> bool:
+        return cls.redirector is not None
+
+    def install(self) -> "list[Path]":
+        paths = self.editable_metadata["paths"]
+        outermost_entities = starmap(_find_outermost_entity, paths.items())
+        specs_to_absolute_paths = {
+            # Shear off the extension from module filenames.
+            t[:-c] if c != -1 else t:
+            # Append ``/__init__.py`` to the path if it's a package.
+            _normalise_package_path(s)
+            for t, s in outermost_entities
+            for c in (t.find("."),)
+        }
+        base_name = f"_editable_{shasum(*outermost_entities)}"
+        editables_path = self.output_directory / f"{base_name}.py"
+        assert self.redirector
+        editables_path.write_bytes(self.redirector)
+        pth_file_path = self.output_directory / f"{base_name}.pth"
+        pth_file_path.write_text(
+            f"import {base_name}; " f"{base_name}.install_redirector({specs_to_absolute_paths})",
+            encoding="utf-8",
+        )
+        return [editables_path, pth_file_path]
+
+
 class PthFileInstaller(
     BaseEditableInstaller,
-    priority=10,
     supported_strategies=frozenset({EditableStrategy.lax}),
+    priority=20,
 ):
     @classmethod
     def is_installation_method_supported(cls, output_directory: "os.PathLike[str] | str") -> bool:
@@ -154,7 +203,7 @@ class PthFileInstaller(
     def install(self) -> "list[Path]":
         paths = self.editable_metadata["paths"]
         parent_folders = uniq(starmap(_find_parent_folder, paths.items()))
-        pth_file_path = self.output_directory / f"editable_{shasum(*parent_folders)}.pth"
+        pth_file_path = self.output_directory / f"_editable_{shasum(*parent_folders)}.pth"
         pth_file_path.write_text(
             "\n".join(parent_folders),
             encoding="utf-8",

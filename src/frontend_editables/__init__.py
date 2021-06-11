@@ -4,6 +4,7 @@ from ._core import (
     EditableDistributionMetadata as EditableDistributionMetadata,
     BaseEditableInstaller as BaseEditableInstaller,
     SymlinkInstaller as SymlinkInstaller,
+    RedirectorInstaller as RedirectorInstaller,
     PthFileInstaller as PthFileInstaller,
     install as install,
 )

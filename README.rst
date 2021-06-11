@@ -5,9 +5,12 @@ This is a PoC of an editable library which operates on the frontend
 `as discussed <https://discuss.python.org/t/discuss-tbd-editable-installs-by-gaborbernat/9071>`__
 on the Python packaging Discourse.
 It supports installing prospective editable distributions
-using two different modes (symlink and ``.pth`` files) and two strategies (lax and strict).
+using three different methods (symlink, redirector and ``.pth`` files)
+and two strategies (lax and strict).
 The strict strategy reproduces the distribution structure faithfully
 whereas the lax strategy exposes the contents of packages as they appear on disk.
+The input must be a mapping of would-be wheel file paths and absolute paths on disk;
+folder paths are invalid.
 This library does not manipulate data files or scripts because I consider that
 to be an unnecessary complication in the context of editable installation.
 
