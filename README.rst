@@ -38,3 +38,24 @@ Basic usage
     )
     # Then append the ``installed_files`` to the distribution's ``RECORD``,
     # optionally by passing ``append_to_record=<path to RECORD>`` to ``install``.
+
+CLI
+---
+
+*frontend_editables* includes an extremely hacky CLI which serves a stopgap
+until editable installation is standardised::
+
+    $ python -m frontend_editables.transitional_cli
+    usage: transitional_cli.py [-h] [--method {symlink,redirect,pth_file}] [--strategy {lax,strict}] path_pairs [path_pairs ...]
+
+    Wacky transitional editable project installer.
+
+    positional arguments:
+    path_pairs            pairs of path on disk and corresponding path in the virtual wheel (posix)
+
+    optional arguments:
+    -h, --help            show this help message and exit
+    --method {symlink,redirect,pth_file}
+                            editable installation method to use (default: None)
+    --strategy {lax,strict}
+                            editable strategy to follow (default: lax)

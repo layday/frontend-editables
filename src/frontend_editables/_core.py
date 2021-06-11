@@ -62,6 +62,7 @@ def _normalise_package_path(source: str) -> str:
 
 class BaseEditableInstaller:
     registry: Final["list[type[BaseEditableInstaller]]"] = []
+    label: str
     supported_strategies: "Set[EditableStrategy]"
 
     def __init__(
@@ -75,9 +76,12 @@ class BaseEditableInstaller:
         self.strategy = strategy
 
     def __init_subclass__(
-        cls, supported_strategies: "Set[EditableStrategy]", priority: int
+        cls, label: str, supported_strategies: "Set[EditableStrategy]", priority: int
     ) -> None:
+        if any(i.label == label for i in cls.registry):
+            raise ValueError("Labels must be unique", (cls, cls.label))
         cls.registry.insert(priority, cls)
+        cls.label = label
         cls.supported_strategies = supported_strategies
 
     @property
@@ -111,6 +115,7 @@ class BaseEditableInstaller:
 
 class SymlinkInstaller(
     BaseEditableInstaller,
+    label="symlink",
     supported_strategies=frozenset({EditableStrategy.lax, EditableStrategy.strict}),
     priority=0,
 ):
@@ -156,14 +161,15 @@ class SymlinkInstaller(
 
 class RedirectorInstaller(
     BaseEditableInstaller,
+    label="redirect",
     supported_strategies=frozenset({EditableStrategy.lax}),
     priority=10,
 ):
-    redirector = pkgutil.get_data(__package__, "_redirector.py")
+    _redirector = pkgutil.get_data(__package__, "_redirector.py")
 
     @classmethod
     def is_installation_method_supported(cls, output_directory: _PathOrStr) -> bool:
-        return cls.redirector is not None
+        return cls._redirector is not None
 
     def install(self) -> "list[Path]":
         paths = self.editable_metadata["paths"]
@@ -178,8 +184,8 @@ class RedirectorInstaller(
         }
         base_name = f"_editable_{shasum(*outermost_entities)}"
         editables_path = self.output_directory / f"{base_name}.py"
-        assert self.redirector
-        editables_path.write_bytes(self.redirector)
+        assert self._redirector
+        editables_path.write_bytes(self._redirector)
         pth_file_path = self.output_directory / f"{base_name}.pth"
         pth_file_path.write_text(
             # fmt: off
@@ -193,6 +199,7 @@ class RedirectorInstaller(
 
 class PthFileInstaller(
     BaseEditableInstaller,
+    label="pth_file",
     supported_strategies=frozenset({EditableStrategy.lax}),
     priority=20,
 ):
