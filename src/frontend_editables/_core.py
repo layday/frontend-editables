@@ -122,23 +122,25 @@ class SymlinkInstaller(
 
         if strategy is EditableStrategy.lax:
             outermost_entities = uniq(starmap(_find_outermost_entity, paths.items()))
-            outermost_paths = [Path(self.output_directory, t) for t, _ in outermost_entities]
+            outermost_paths = [self.output_directory / t for t, _ in outermost_entities]
             for target_path, (_, source) in zip(outermost_paths, outermost_entities):
                 os.symlink(source, target_path)
+
             return outermost_paths
 
         elif strategy is EditableStrategy.strict:
-            materialized_paths = {
-                os.path.join(self.output_directory, os.path.normpath(t)): s
-                for t, s in paths.items()
-            }
-            package_paths = uniq(os.path.dirname(t) for t in materialized_paths)
-            for package in package_paths:
-                os.makedirs(package, exist_ok=True)
-            for target, source in materialized_paths.items():
-                os.symlink(source, target)
-            return list(map(Path, materialized_paths))
+            packages = uniq(
+                self.output_directory / d
+                for t in paths
+                for d in (posixpath.dirname(t),)
+                if d
+            )
+            for package_path in packages:
+                os.makedirs(package_path, exist_ok=True)
 
+            all_files = [self.output_directory / t for t, _ in paths.items()]
+            for target_path, source in zip(all_files, paths.values()):
+                os.symlink(source, target_path)
 
 class PthFileInstaller(
     BaseEditableInstaller,
