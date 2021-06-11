@@ -74,18 +74,19 @@ def dummy_dist_info(tmp_path):
 
 
 @pytest.fixture
-def path_runner():
+def path_runner(tmp_path):
     def module_path_to_spec(path):
         return path.replace("/__init__.py", "").replace(".py", "").rstrip("/").replace("/", ".")
 
     def run(*module_paths, python_path):
-        subprocess.check_call(
-            [
-                sys.executable,
-                "-c",
-                f'import site\nsite.addsitedir("{python_path}")\n'
-                + "".join(f"import {module_path_to_spec(p)}\n" for p in module_paths),
-            ]
+        runner_directory = tmp_path / "runner"
+        runner_directory.mkdir()
+        runner = runner_directory / "runner.py"
+        runner.write_text(
+            f'import site\nsite.addsitedir(r"{python_path}")\n'
+            + "".join(f"import {module_path_to_spec(p)}\n" for p in module_paths),
+            encoding="utf-8",
         )
+        subprocess.check_call([sys.executable, str(runner)])
 
     yield run
