@@ -81,3 +81,17 @@ def test_symlink_strict_strategy_files_are_added_to_record(tmp_path, dummy_dist_
         .read_text(encoding="utf-8")
         .endswith("".join(f"{t},,\n" for t in dummy_paths["paths"]))
     )
+
+
+@pytest.mark.parametrize("strategy", frontend_editables.EditableStrategy)
+def test_symlinks_can_be_imported(tmp_path, dummy_paths, path_runner, strategy):
+    output_directory = tmp_path / "out"
+    output_directory.mkdir()
+
+    frontend_editables.install(
+        output_directory,
+        dummy_paths,
+        strategy,
+        frontend_editables.SymlinkInstaller,
+    )
+    path_runner(*dummy_paths["paths"], python_path=output_directory)

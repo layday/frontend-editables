@@ -1,7 +1,9 @@
 import os
 import os.path
+import subprocess
 
 import pytest
+import sys
 
 
 LAYOUTS = {
@@ -69,3 +71,21 @@ def dummy_dist_info(tmp_path):
         encoding="utf-8",
     )
     yield dist_info
+
+
+@pytest.fixture
+def path_runner():
+    def module_path_to_spec(path):
+        return path.replace("/__init__.py", "").replace(".py", "").rstrip("/").replace("/", ".")
+
+    def run(*module_paths, python_path):
+        subprocess.check_call(
+            [
+                sys.executable,
+                "-c",
+                f'import site\nsite.addsitedir("{python_path}")\n'
+                + "".join(f"import {module_path_to_spec(p)}\n" for p in module_paths),
+            ]
+        )
+
+    yield run
