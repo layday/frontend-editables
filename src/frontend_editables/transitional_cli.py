@@ -84,7 +84,7 @@ def _rebuild_wheel(tempdir: str, wheel_path: str) -> None:
                 wheel.write(absolute_path, in_wheel_path)
 
 
-def _pip_build_wheel(tempdir: str) -> str:
+def _pip_build_wheel(tempdir: str, spec: str) -> str:
     subprocess.check_call(
         [
             sys.executable,
@@ -94,7 +94,7 @@ def _pip_build_wheel(tempdir: str) -> str:
             "--no-deps",
             "--wheel-dir",
             tempdir,
-            ".",
+            spec,
         ]
     )
     return next(os.scandir(tempdir)).path
@@ -149,6 +149,11 @@ def main(args: "Sequence[str] | None" = None) -> None:
         default=EditableStrategy.lax.value,
         help="editable strategy to follow",
         type=EditableStrategy,
+    )
+    parser.add_argument(
+        "--spec",
+        default=".",
+        help="requirement specifier",
     )
     parsed_args = parser.parse_args(args)
 
