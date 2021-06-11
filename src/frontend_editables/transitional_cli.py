@@ -167,7 +167,7 @@ def main(args: "Sequence[str] | None" = None) -> None:
     else:
         installer_cls = None
 
-    with tempfile.TemporaryDirectory() as tempdir:
+    with tempfile.TemporaryDirectory(prefix="frontend-editables-transitional-cli") as tempdir:
         wheel_path = _pip_build_wheel(tempdir, parsed_args.spec)
         _rebuild_wheel(tempdir, wheel_path)
         _pip_install_wheel(wheel_path)
