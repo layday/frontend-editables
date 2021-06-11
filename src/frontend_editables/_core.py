@@ -8,9 +8,11 @@ from pathlib import Path
 import posixpath
 import tempfile
 
-from typing_extensions import Final, TypedDict
+from typing_extensions import Final, TypeAlias, TypedDict
 
 from ._utils import shasum, uniq
+
+_PathOrStr: TypeAlias = "os.PathLike[str] | str"
 
 
 class EditableStrategy(str, enum.Enum):
@@ -52,7 +54,7 @@ class BaseEditableInstaller:
 
     def __init__(
         self,
-        output_directory: "os.PathLike[str] | str",
+        output_directory: _PathOrStr,
         editable_metadata: EditableDistributionMetadata,
         strategy: EditableStrategy,
     ) -> None:
@@ -78,7 +80,7 @@ class BaseEditableInstaller:
 
     @classmethod
     def is_installation_method_supported(
-        cls, output_directory: "os.PathLike[str] | str"
+        cls, output_directory: _PathOrStr
     ) -> bool:  # pragma: no cover
         raise NotImplementedError
 
@@ -86,7 +88,7 @@ class BaseEditableInstaller:
         raise NotImplementedError
 
     def append_to_record(
-        self, record_path: "os.PathLike[str] | str", installed_files: "Collection[Path]"
+        self, record_path: _PathOrStr, installed_files: "Collection[Path]"
     ) -> None:
         with open(record_path, "a", encoding="utf-8") as record:
             record.writelines(
@@ -102,7 +104,7 @@ class SymlinkInstaller(
 ):
     @classmethod
     @lru_cache()
-    def is_installation_method_supported(cls, output_directory: "os.PathLike[str] | str") -> bool:
+    def is_installation_method_supported(cls, output_directory: _PathOrStr) -> bool:
         with tempfile.TemporaryDirectory(
             prefix="_test-frontend-editables-symlinking",
             dir=output_directory,
@@ -159,7 +161,7 @@ class PthFileInstaller(
 
 
 def install(
-    output_directory: "os.PathLike[str] | str",
+    output_directory: _PathOrStr,
     editable_metadata: EditableDistributionMetadata,
     strategy: EditableStrategy,
     installer_cls: "type[BaseEditableInstaller] | None" = None,

@@ -13,7 +13,7 @@ authors = [
   { name = "layday", email = "layday@protonmail.com" },
 ]
 dependencies = [
-  "typing-extensions",
+  "typing-extensions >=3.10.0.0",
 ]
 
 [project.optional-dependencies]
