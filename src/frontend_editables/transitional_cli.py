@@ -12,7 +12,7 @@ import zipfile
 from . import BaseEditableInstaller, EditableStrategy, EditableDistributionMetadata, install
 
 
-def _slice_pairs(path_map: Sequence[str]) -> "list[tuple[str, str]]":
+def _slice_pairs(path_map: "Sequence[str]") -> "list[tuple[str, str]]":
     if len(path_map) % 2:
         raise ValueError("Sequence must be even in length", path_map)
 
