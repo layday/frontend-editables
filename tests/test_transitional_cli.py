@@ -21,10 +21,12 @@ def test_env(tmp_path):
 def test_self_install_from_path_with_default_settings(test_env):
     python_executable = os.path.join(test_env["scripts"], os.path.basename(sys.executable))
 
+    install_args = [python_executable, "-m", "pip", "install", "typing-extensions"]
     if sys.version_info < (3, 7):
-        # Old pip version does not support PEP 517.
-        subprocess.check_call([python_executable, "-m", "pip", "install", "-U", "pip"])
-    subprocess.check_call([python_executable, "-m", "pip", "install", "typing-extensions"])
+        # Old pip does not support PEP 517.
+        install_args += ["-U", "pip"]
+
+    subprocess.check_call(install_args)
     subprocess.check_call(
         [
             python_executable,
@@ -41,13 +43,15 @@ def test_self_install_from_path_with_default_settings(test_env):
     assert any(p["name"] == "frontend-editables" for p in pip_list)
 
 
-def test_self_install_from_path_with_default_with_spec(test_env):
+def test_self_install_from_path_with_spec(test_env):
     python_executable = os.path.join(test_env["scripts"], os.path.basename(sys.executable))
 
+    install_args = [python_executable, "-m", "pip", "install", "typing-extensions"]
     if sys.version_info < (3, 7):
-        # Old pip version does not support PEP 517.
-        subprocess.check_call([python_executable, "-m", "pip", "install", "-U", "pip"])
-    subprocess.check_call([python_executable, "-m", "pip", "install", "typing-extensions"])
+        # Old pip does not support PEP 517.
+        install_args += ["-U", "pip"]
+
+    subprocess.check_call(install_args)
     subprocess.check_call(
         [
             python_executable,
