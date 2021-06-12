@@ -134,6 +134,7 @@ def main(args: "Sequence[str] | None" = None) -> None:
     parser = argparse.ArgumentParser(
         description="Wacky transitional editable project installer.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        prog=f"{os.path.basename(sys.executable)} -m frontend_editables.transitional_cli",
     )
     parser.add_argument(
         "path_pairs",
