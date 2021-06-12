@@ -1,3 +1,4 @@
+import os
 import os.path
 import subprocess
 import sys
@@ -24,6 +25,6 @@ def test_self_install_from_path_with_default_settings(tmp_path):
             "src/frontend_editables",
             "frontend_editables",
         ],
-        env={"PYTHONPATH": "src"},
+        env={**os.environ, "PYTHONPATH": "src"},
     )
     assert os.path.islink(os.path.join(paths["purelib"], "frontend_editables"))
