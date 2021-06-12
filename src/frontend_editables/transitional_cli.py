@@ -100,14 +100,16 @@ def _pip_build_wheel(tempdir: str, spec: str) -> str:
     return next(os.scandir(tempdir)).path
 
 
-def _pip_install_wheel(wheel_path: str) -> None:
+def _pip_install_wheel(wheel_path: str, spec: str) -> None:
+    extras_sep = spec.find("[")
+    extras = spec[extras_sep:] if extras_sep != -1 else ""
     subprocess.check_call(
         [
             sys.executable,
             "-m",
             "pip",
             "install",
-            wheel_path,
+            wheel_path + extras,
         ]
     )
 
@@ -175,7 +177,7 @@ def main(args: "Sequence[str] | None" = None) -> None:
     with tempfile.TemporaryDirectory(prefix="frontend-editables-transitional-cli") as tempdir:
         wheel_path = _pip_build_wheel(tempdir, parsed_args.spec)
         _rebuild_wheel(tempdir, wheel_path)
-        _pip_install_wheel(wheel_path)
+        _pip_install_wheel(wheel_path, parsed_args.spec)
         pip_info = _pip_info_json()
         distribution, _, _ = os.path.basename(wheel_path).partition("-")
         normalized_distribution = distribution.replace("_", "-")
