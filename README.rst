@@ -19,7 +19,7 @@ Installation
 
 .. code-block::
 
-    python -m pip install git+https://github.com/layday/frontend-editables
+    $ python -m pip install git+https://github.com/layday/frontend-editables
 
 Basic usage
 -----------
@@ -43,10 +43,23 @@ CLI
 ---
 
 *frontend_editables* includes an extremely hacky CLI which serves a stopgap
-until editable installation is standardised::
+until editable installation is standardised.  You can use this in place
+of ``python -m pip install -e ...``.  The CLI supports all of the same
+layouts and installation methods supported by the library.  Some examples:
 
-    $ python -m frontend_editables.transitional_cli
-    usage: transitional_cli.py [-h] [--method {symlink,redirect,pth_file}] [--strategy {lax,strict}] path_pairs [path_pairs ...]
+* To install a project with a single module ``foo.py``, symlinking it:
+  ``python -m frontend_editables.transitional_cli --strategy strict foo.py foo.py``.
+* To install a project with a package ``foo``, located in ``<project-root>/src/foo``,
+  with the aid of a ``pth`` file:
+  ``python -m frontend_editables.transitional_cli --method pth_file src/foo foo``.
+* To install a project with multiple packages at different locations:
+  ``python -m frontend_editables.transitional_cli {src/,}foo {lib/,}bar``
+
+Editable distributions can be uninstalled with pip as normal.
+
+.. code-block::
+
+    usage: python -m frontend_editables.transitional_cli [-h] [--method {symlink,redirect,pth_file}] [--strategy {lax,strict}] [--spec SPEC] path_pairs [path_pairs ...]
 
     Wacky transitional editable project installer.
 
@@ -59,3 +72,4 @@ until editable installation is standardised::
                             editable installation method to use (default: None)
     --strategy {lax,strict}
                             editable strategy to follow (default: lax)
+    --spec SPEC           requirement specifier (default: .)
