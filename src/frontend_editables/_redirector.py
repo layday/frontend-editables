@@ -13,14 +13,21 @@ import importlib.util
 import sys
 
 
+_redirections = {}
+
+
+class RedirectingFinder:
+    @staticmethod
+    def find_spec(fullname: str, path: "Sequence[bytes | str] | None", target: object = None):
+        if "." in fullname or path is not None or fullname not in _redirections:
+            return None
+        maybe_spec = importlib.util.spec_from_file_location(fullname, _redirections[fullname])
+        return maybe_spec
+
+
 def install_redirector(redirections: "dict[str, str]") -> None:
-    class RedirectingFinder:
-        @staticmethod
-        def find_spec(fullname: str, path: "Sequence[bytes | str] | None", target: object = None):
-            if "." in fullname or path is not None or fullname not in redirections:
-                return None
-            maybe_spec = importlib.util.spec_from_file_location(fullname, redirections[fullname])
-            return maybe_spec
+    global _redirections
+    _redirections = redirections
 
     for finder in sys.meta_path:
         if finder is RedirectingFinder:
