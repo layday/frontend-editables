@@ -79,7 +79,7 @@ class BaseEditableInstaller:
         cls, label: str, supported_strategies: "Set[EditableStrategy]", priority: int
     ) -> None:
         if any(i.label == label for i in cls.registry):
-            raise ValueError("Labels must be unique", (cls, cls.label))
+            raise ValueError("Labels must be unique", (cls, label))
         cls.registry.insert(priority, cls)
         cls.label = label
         cls.supported_strategies = supported_strategies
