@@ -4,6 +4,13 @@ import sysconfig
 import nox
 
 
+@nox.session(reuse_venv=True)
+def reformat(session: nox.Session):
+    session.install("black", "isort")
+    for command in ["isort", "black"]:
+        session.run(command, "src", "tests", "noxfile.py")
+
+
 def _install_coverage_hook(prefix: str):
     (Path(sysconfig.get_paths(vars={"base": prefix})["purelib"]) / "00-coverage.pth").write_text(
         "import coverage; coverage.process_startup()",
@@ -27,10 +34,3 @@ def test(session: nox.Session):
 def type_check(session: nox.Session):
     session.install(".")
     session.run("npx", "pyright", external=True)
-
-
-@nox.session(reuse_venv=True)
-def reformat(session: nox.Session):
-    session.install("black", "isort")
-    for command in ["isort", "black"]:
-        session.run(command, "src", "tests", "noxfile.py")
