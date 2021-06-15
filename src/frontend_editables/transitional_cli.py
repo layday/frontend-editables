@@ -9,7 +9,7 @@ import sys
 import tempfile
 import zipfile
 
-from . import BaseEditableInstaller, EditableStrategy, EditableDistributionMetadata, install
+from . import BaseEditableInstaller, EditableDistributionMetadata, EditableStrategy, install
 
 
 def _slice_pairs(path_map: "Sequence[str]") -> "list[tuple[str, str]]":

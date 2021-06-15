@@ -1,10 +1,9 @@
 import os
 import os.path
 import subprocess
-
-import pytest
 import sys
 
+import pytest
 
 LAYOUTS = {
     "single-package": {

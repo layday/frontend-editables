@@ -27,3 +27,10 @@ def test(session: nox.Session):
 def type_check(session: nox.Session):
     session.install(".")
     session.run("npx", "pyright", external=True)
+
+
+@nox.session(reuse_venv=True)
+def reformat(session: nox.Session):
+    session.install("black", "isort")
+    for command in ["isort", "black"]:
+        session.run(command, "src", "tests", "noxfile.py")

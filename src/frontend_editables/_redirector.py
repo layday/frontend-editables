@@ -12,7 +12,6 @@ from collections.abc import Sequence
 import importlib.util
 import sys
 
-
 _redirections = {}
 
 
