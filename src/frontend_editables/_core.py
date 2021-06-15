@@ -1,6 +1,7 @@
 from collections.abc import Collection, Set
 import enum
 from functools import lru_cache
+import importlib.machinery
 from itertools import starmap
 import os
 import os.path
@@ -49,7 +50,15 @@ def _find_parent_folder(target: str, source: str) -> str:
     return os.path.dirname(source)
 
 
-def _normalise_package_path(source: str) -> str:
+def _normalize_module_name(name: str, suffixes: "tuple[str, ...]") -> str:
+    if "." not in name:
+        return name
+    (suffix,) = (s for s in suffixes if name.endswith(s))
+    name = name[: name.rfind(suffix)]
+    return name
+
+
+def _normalize_package_path(source: str) -> str:
     if os.path.isdir(source):
         source = os.path.join(source, "__init__.py")
         if not os.path.isfile(source):
@@ -166,6 +175,7 @@ class RedirectorInstaller(
     priority=10,
 ):
     _redirector = pkgutil.get_data(__package__, "_redirector.py")
+    _module_suffixes = tuple(importlib.machinery.all_suffixes())
 
     @classmethod
     def is_installation_method_supported(cls, output_directory: _PathOrStr) -> bool:
@@ -173,14 +183,13 @@ class RedirectorInstaller(
 
     def install(self) -> "list[Path]":
         paths = self.editable_metadata["paths"]
-        outermost_entities = starmap(_find_outermost_entity, paths.items())
+        outermost_entities = uniq(starmap(_find_outermost_entity, paths.items()))
         specs_to_absolute_paths = {
             # Shear off the extension from module filenames.
-            t[:-c] if c != -1 else t:
+            _normalize_module_name(t, self._module_suffixes):
             # Append ``/__init__.py`` to the path if it's a package.
-            _normalise_package_path(s)
+            _normalize_package_path(s)
             for t, s in outermost_entities
-            for c in (t.find("."),)
         }
         base_name = f"_editable_{shasum(*outermost_entities)}"
         editables_path = self.output_directory / f"{base_name}.py"
