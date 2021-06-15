@@ -83,7 +83,8 @@ def path_runner(tmp_path):
         runner_directory.mkdir()
         runner = runner_directory / "runner.py"
         runner.write_text(
-            f'import site\nsite.addsitedir(r"{python_path}")\n'
+            "import site\n"
+            f'site.addsitedir(r"{python_path}")\n'
             + "".join(f"import {module_path_to_spec(p)}\n" for p in module_paths),
             encoding="utf-8",
         )

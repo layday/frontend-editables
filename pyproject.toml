@@ -30,9 +30,17 @@ changelog = "https://github.com/layday/frontend-editables/blob/main/CHANGELOG.rs
 
 
 [tool.coverage.run]
-source = ["frontend_editables"]
+source_pkgs = ["frontend_editables"]
 omit = ["**/frontend_editables/_redirector.py"]
+parallel = true
 branch = true
+dynamic_context = "test_function"
+
+[tool.coverage.paths]
+combine = [
+  "src/frontend_editables",
+  "**/frontend_editables",
+]
 
 
 [tool.pyright]

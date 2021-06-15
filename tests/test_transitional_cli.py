@@ -18,15 +18,22 @@ def test_env(tmp_path):
     yield test_env_paths
 
 
-def test_self_install_from_path_with_default_settings(test_env):
-    python_executable = os.path.join(test_env["scripts"], os.path.basename(sys.executable))
-
-    install_args = [python_executable, "-m", "pip", "install", "typing-extensions"]
+def bootstrap_env(test_env, python_executable):
     if sys.version_info < (3, 7):
         # Old pip does not support PEP 517.
-        install_args += ["-U", "pip"]
+        subprocess.check_call([python_executable, "-m", "pip", "install", "-U", "pip"])
+    subprocess.check_call([python_executable, "-m", "pip", "install", ".[test]"])
+    subprocess.check_call(
+        [python_executable, "-m", "pip", "uninstall", "-y", "frontend_editables"]
+    )
 
-    subprocess.check_call(install_args)
+    with open(os.path.join(test_env["purelib"], "00-coverage.pth"), "w") as pth_file:
+        pth_file.write("import coverage; coverage.process_startup()")
+
+
+def test_self_install_from_path_with_default_settings(test_env):
+    python_executable = os.path.join(test_env["scripts"], os.path.basename(sys.executable))
+    bootstrap_env(test_env, python_executable)
     subprocess.check_call(
         [
             python_executable,
@@ -45,13 +52,7 @@ def test_self_install_from_path_with_default_settings(test_env):
 
 def test_self_install_from_path_with_spec(test_env):
     python_executable = os.path.join(test_env["scripts"], os.path.basename(sys.executable))
-
-    install_args = [python_executable, "-m", "pip", "install", "typing-extensions"]
-    if sys.version_info < (3, 7):
-        # Old pip does not support PEP 517.
-        install_args += ["-U", "pip"]
-
-    subprocess.check_call(install_args)
+    bootstrap_env(test_env, python_executable)
     subprocess.check_call(
         [
             python_executable,
