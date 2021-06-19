@@ -30,6 +30,7 @@ def test_parent_folders_are_listed_in_pth_file(tmp_path, dummy_paths, errorconte
 
     with errorcontext:
         frontend_editables.install(
+            "test_pth_file",
             output_directory,
             dummy_paths,
             frontend_editables.EditableStrategy.lax,
@@ -58,6 +59,7 @@ def test_pth_file_is_added_to_record(tmp_path, dummy_paths, dummy_dist_info, err
 
     with errorcontext:
         frontend_editables.install(
+            "test_pth_file",
             output_directory,
             dummy_paths,
             frontend_editables.EditableStrategy.lax,
@@ -78,6 +80,7 @@ def test_pth_file_submodules_can_be_imported(tmp_path, dummy_paths, path_runner,
 
     with errorcontext:
         frontend_editables.install(
+            "test_pth_file",
             output_directory,
             dummy_paths,
             frontend_editables.EditableStrategy.lax,

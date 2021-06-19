@@ -12,7 +12,7 @@ import tempfile
 
 from typing_extensions import Final, TypeAlias, TypedDict
 
-from ._utils import shasum, uniq
+from ._utils import uniq
 
 _PathOrStr: TypeAlias = "os.PathLike[str] | str"
 
@@ -76,10 +76,12 @@ class BaseEditableInstaller:
 
     def __init__(
         self,
+        name: str,
         output_directory: _PathOrStr,
         editable_metadata: EditableDistributionMetadata,
         strategy: EditableStrategy,
     ) -> None:
+        self.name: str = name
         self.output_directory: Path = Path(output_directory)
         self.editable_metadata: EditableDistributionMetadata = editable_metadata
         self.strategy = strategy
@@ -191,7 +193,7 @@ class RedirectorInstaller(
             _normalize_package_path(s)
             for t, s in outermost_entities
         }
-        base_name = f"_editable_{shasum(*outermost_entities)}"
+        base_name = f"_editable_{self.name}"
         editables_path = self.output_directory / f"{base_name}.py"
         assert self._redirector
         editables_path.write_bytes(self._redirector)
@@ -219,7 +221,7 @@ class PthFileInstaller(
     def install(self) -> "list[Path]":
         paths = self.editable_metadata["paths"]
         parent_folders = uniq(starmap(_find_parent_folder, paths.items()))
-        pth_file_path = self.output_directory / f"_editable_{shasum(*parent_folders)}.pth"
+        pth_file_path = self.output_directory / f"_editable_{self.name}.pth"
         pth_file_path.write_text(
             "\n".join(parent_folders),
             encoding="utf-8",
@@ -228,6 +230,7 @@ class PthFileInstaller(
 
 
 def install(
+    name: str,
     output_directory: _PathOrStr,
     editable_metadata: EditableDistributionMetadata,
     strategy: EditableStrategy,
@@ -246,7 +249,7 @@ def install(
     if installer_cls is None:
         raise ValueError("No installer could satisfy strategy", strategy)
 
-    installer = installer_cls(output_directory, editable_metadata, strategy)
+    installer = installer_cls(name, output_directory, editable_metadata, strategy)
     installed_files = installer.install()
     if append_to_record is not None:
         installer.append_to_record(append_to_record, installed_files)

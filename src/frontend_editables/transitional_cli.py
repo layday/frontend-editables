@@ -184,6 +184,7 @@ def main(args: "Sequence[str] | None" = None) -> None:
         normalized_distribution = distribution.replace("_", "-")
         package = next(i for i in pip_info if i["name"] == normalized_distribution)
         install(
+            package["name"],
             package["location"],
             editable_metadata,
             parsed_args.strategy,

@@ -32,6 +32,7 @@ Basic usage
 
     path_mapping = ...  # Will have been returned by the backend.
     installed_files = frontend_editables.install(
+        "name",
         sysconfig.get_path("purelib"),
         path_mapping,
         frontend_editables.EditableStrategy.lax,

@@ -29,6 +29,7 @@ def test_redirector_paths_are_added_to_record(
 
     with errorcontext:
         frontend_editables.install(
+            "test_redirector",
             output_directory,
             dummy_paths,
             frontend_editables.EditableStrategy.lax,
@@ -49,6 +50,7 @@ def test_redirector_modules_can_be_imported(tmp_path, dummy_paths, path_runner, 
 
     with errorcontext:
         frontend_editables.install(
+            "test_redirector",
             output_directory,
             dummy_paths,
             frontend_editables.EditableStrategy.lax,

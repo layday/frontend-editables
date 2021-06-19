@@ -11,6 +11,7 @@ def test_symlink_lax_strategy_outermost_entities_are_symlinked_successfully(tmp_
     output_directory.mkdir()
 
     frontend_editables.install(
+        "test_symlink",
         output_directory,
         dummy_paths,
         frontend_editables.EditableStrategy.lax,
@@ -27,6 +28,7 @@ def test_symlink_strict_strategy_files_are_symlinked_successfully(tmp_path, dumm
     output_directory.mkdir()
 
     frontend_editables.install(
+        "test_symlink",
         output_directory,
         dummy_paths,
         frontend_editables.EditableStrategy.strict,
@@ -47,6 +49,7 @@ def test_symlink_lax_strategy_outermost_entities_are_added_to_record(
     output_directory.mkdir()
 
     frontend_editables.install(
+        "test_symlink",
         output_directory,
         dummy_paths,
         frontend_editables.EditableStrategy.lax,
@@ -70,6 +73,7 @@ def test_symlink_strict_strategy_files_are_added_to_record(tmp_path, dummy_dist_
     output_directory.mkdir()
 
     frontend_editables.install(
+        "test_symlink",
         output_directory,
         dummy_paths,
         frontend_editables.EditableStrategy.strict,
@@ -89,6 +93,7 @@ def test_symlinks_can_be_imported(tmp_path, dummy_paths, path_runner, strategy):
     output_directory.mkdir()
 
     frontend_editables.install(
+        "test_symlink",
         output_directory,
         dummy_paths,
         strategy,

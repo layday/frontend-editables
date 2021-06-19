@@ -15,9 +15,9 @@ def test_unsupported_installer_strategy_assignment_raises(monkeypatch):
         pass
 
     with pytest.raises(ValueError, match="Unsupported strategy"):
-        Foo("", {}, frontend_editables.EditableStrategy.strict)
+        Foo("foo", "", {}, frontend_editables.EditableStrategy.strict)
 
-    foo = Foo("", {}, frontend_editables.EditableStrategy.lax)
+    foo = Foo("foo", "", {}, frontend_editables.EditableStrategy.lax)
     with pytest.raises(ValueError, match="Unsupported strategy"):
         foo.strategy = frontend_editables.EditableStrategy.strict
 
@@ -27,7 +27,7 @@ def test_installer_candidates_exhausted(monkeypatch, strategy):
     monkeypatch.setattr("frontend_editables.BaseEditableInstaller.registry", [])
 
     with pytest.raises(ValueError, match="No installer could satisfy strategy"):
-        frontend_editables.install("", {}, strategy)
+        frontend_editables.install("foo", "", {}, strategy)
 
 
 def test_adding_installer_with_duplicate_label_raises(monkeypatch):
