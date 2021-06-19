@@ -143,7 +143,7 @@ def main(args: "Sequence[str] | None" = None) -> None:
         for f, t in path_pairs
         for p in _get_paths(os.path.relpath(os.path.normpath(f), os.getcwd()), os.path.normpath(t))
     )
-    editable_metadata = EditableDistributionMetadata(paths=paths)
+    editable_metadata: EditableDistributionMetadata = {"paths": paths}
 
     if parsed_args.method is not None:
         installer_cls = next(

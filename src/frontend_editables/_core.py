@@ -9,10 +9,14 @@ from pathlib import Path
 import pkgutil
 import posixpath
 import tempfile
+from typing import TYPE_CHECKING
 
-from typing_extensions import Final, TypeAlias, TypedDict
+from ._utils import GenericGetitem, uniq
 
-from ._utils import uniq
+if TYPE_CHECKING:
+    from typing_extensions import Final, TypeAlias, TypedDict
+else:
+    Final = TypeAlias = TypedDict = GenericGetitem
 
 _PathOrStr: TypeAlias = "os.PathLike[str] | str"
 

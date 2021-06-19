@@ -41,7 +41,7 @@ Basic usage
     # optionally by passing ``append_to_record=<path to RECORD>`` to ``install``.
 
 CLI
----
+~~~
 
 *frontend_editables* includes an extremely hacky CLI which serves a stopgap
 until editable installation is standardised.  You can use this in place
@@ -60,17 +60,34 @@ Editable distributions can be uninstalled with pip as normal.
 
 .. code-block::
 
-    usage: python -m frontend_editables.transitional_cli [-h] [--method {symlink,redirect,pth_file}] [--strategy {lax,strict}] [--spec SPEC] path_pairs [path_pairs ...]
+    usage: python -m frontend_editables.transitional_cli [-h]
+                                                         [--method {symlink,redirect,pth_file}]
+                                                         [--strategy {lax,strict}]
+                                                         [--spec SPEC]
+                                                         path_pairs
+                                                         [path_pairs ...]
 
     Wacky transitional editable project installer.
 
     positional arguments:
-    path_pairs            pairs of path on disk and corresponding path in the virtual wheel (posix)
+      path_pairs            pairs of path on disk and corresponding path in
+                            the virtual wheel (posix)
 
     optional arguments:
-    -h, --help            show this help message and exit
-    --method {symlink,redirect,pth_file}
-                            editable installation method to use (default: None)
-    --strategy {lax,strict}
+      -h, --help            show this help message and exit
+      --method {symlink,redirect,pth_file}
+                            editable installation method to use (default:
+                            None)
+      --strategy {lax,strict}
                             editable strategy to follow (default: lax)
-    --spec SPEC           requirement specifier (default: .)
+      --spec SPEC           requirement specifier (default: .)
+
+Contributing
+------------
+
+You can use *frontend-editables* to install *frontend-editables* for development::
+
+    $ PYTHONPATH=src python -m frontend_editables.transitional_cli \
+      --spec .[test] {src/,}frontend_editables
+
+Happy hacking!
