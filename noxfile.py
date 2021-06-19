@@ -7,8 +7,9 @@ import nox
 @nox.session(reuse_venv=True)
 def reformat(session: nox.Session):
     session.install("black", "isort")
+    options = ["--check"] if session.posargs == ["check"] else []
     for command in ["isort", "black"]:
-        session.run(command, "src", "tests", "noxfile.py")
+        session.run(command, *options, "src", "tests", "noxfile.py")
 
 
 def _install_coverage_hook(prefix: str):
