@@ -86,16 +86,7 @@ def _rebuild_wheel(tempdir: str, wheel_path: str) -> None:
 
 def _pip_build_wheel(tempdir: str, spec: str) -> str:
     subprocess.check_call(
-        [
-            sys.executable,
-            "-m",
-            "pip",
-            "wheel",
-            "--no-deps",
-            "--wheel-dir",
-            tempdir,
-            spec,
-        ]
+        [sys.executable, "-m", "pip", "wheel", "--no-deps", "--wheel-dir", tempdir, spec],
     )
     return next(os.scandir(tempdir)).path
 
@@ -104,28 +95,14 @@ def _pip_install_wheel(wheel_path: str, spec: str) -> None:
     extras_sep = spec.find("[")
     extras = spec[extras_sep:] if extras_sep != -1 else ""
     subprocess.check_call(
-        [
-            sys.executable,
-            "-m",
-            "pip",
-            "install",
-            wheel_path + extras,
-        ]
+        [sys.executable, "-m", "pip", "install", wheel_path + extras],
     )
 
 
 def _pip_info_json() -> "list[dict[str, str]]":
     return json.loads(
         subprocess.check_output(
-            [
-                sys.executable,
-                "-m",
-                "pip",
-                "--verbose",
-                "list",
-                "--format",
-                "json",
-            ]
+            [sys.executable, "-m", "pip", "--verbose", "list", "--format", "json"],
         )
     )
 
