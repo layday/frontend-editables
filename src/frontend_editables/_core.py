@@ -73,6 +73,18 @@ def _normalize_package_path(source: str) -> str:
     return source
 
 
+@lru_cache()
+def _can_symlink(output_directory: _PathOrStr) -> bool:
+    with tempfile.TemporaryDirectory(
+        prefix="_test-frontend-editables-symlinking", dir=output_directory
+    ) as tempdir:
+        try:
+            Path(tempdir, "bar").symlink_to(Path(tempdir, "foo"))
+            return True
+        except (AttributeError, NotImplementedError, OSError):
+            return False
+
+
 class BaseEditableInstaller:
     registry: Final["list[type[BaseEditableInstaller]]"] = []
     label: str
@@ -135,17 +147,8 @@ class SymlinkInstaller(
     priority=0,
 ):
     @classmethod
-    @lru_cache()
     def is_installation_method_supported(cls, output_directory: _PathOrStr) -> bool:
-        with tempfile.TemporaryDirectory(
-            prefix="_test-frontend-editables-symlinking",
-            dir=output_directory,
-        ) as tempdir:
-            try:
-                os.symlink(os.path.join(tempdir, "foo"), os.path.join(tempdir, "bar"))
-                return True
-            except (AttributeError, NotImplementedError, OSError):
-                return False
+        return _can_symlink(output_directory)
 
     def install(self) -> "list[Path]":
         # Reassigning strategy for exhaustiveness check in Pyright.
@@ -156,7 +159,7 @@ class SymlinkInstaller(
             outermost_entities = uniq(starmap(_find_outermost_entity, paths.items()))
             outermost_paths = [self.output_directory / t for t, _ in outermost_entities]
             for target_path, (_, source) in zip(outermost_paths, outermost_entities):
-                os.symlink(source, target_path)
+                target_path.symlink_to(source)
 
             return outermost_paths
 
@@ -169,7 +172,7 @@ class SymlinkInstaller(
 
             all_files = [self.output_directory / t for t in paths]
             for target_path, source in zip(all_files, paths.values()):
-                os.symlink(source, target_path)
+                target_path.symlink_to(source)
 
             return all_files
 
