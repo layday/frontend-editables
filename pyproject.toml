@@ -45,7 +45,7 @@ combine = [
 
 [tool.pyright]
 include = ["src"]
-strict = true
+strict = ["src"]
 
 
 [tool.black]
