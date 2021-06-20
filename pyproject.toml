@@ -1,9 +1,9 @@
 [build-system]
-requires = ["flit_core >=3.2.0"]
+requires = ["flit-core >=3.2.0"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "frontend_editables"
+name = "frontend-editables"
 version = "0.1.0"
 description = "A library for installing distributions in editable mode."
 readme = "README.rst"
@@ -28,6 +28,9 @@ homepage = "https://github.com/layday/frontend-editables"
 repository = "https://github.com/layday/frontend-editables"
 changelog = "https://github.com/layday/frontend-editables/blob/main/CHANGELOG.rst"
 
+[tool.flit.module]
+name = "frontend_editables"
+
 
 [tool.coverage.run]
 source_pkgs = ["frontend_editables"]
@@ -37,10 +40,7 @@ branch = true
 dynamic_context = "test_function"
 
 [tool.coverage.paths]
-combine = [
-  "src/frontend_editables",
-  "**/frontend_editables",
-]
+combine = ["src/frontend_editables", "**/frontend_editables"]
 
 
 [tool.pyright]

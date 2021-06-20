@@ -19,7 +19,7 @@ Installation
 
 .. code-block::
 
-    $ python -m pip install git+https://github.com/layday/frontend-editables
+    $ python -m pip install frontend-editables
 
 Basic usage
 -----------
@@ -88,6 +88,9 @@ Contributing
 You can use *frontend-editables* to install *frontend-editables* for development::
 
     $ PYTHONPATH=src python -m frontend_editables.transitional_cli \
-      --spec .[test] {src/,}frontend_editables
+        --spec .[test] {src/,}frontend_editables
+
+Before opening a merge request, install `nox <https://github.com/theacodes/nox>`__
+and run ``nox``.  The type checking step has an external dependency on ``npm``.
 
 Happy hacking!

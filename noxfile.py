@@ -3,6 +3,8 @@ import sysconfig
 
 import nox
 
+nox.options.sessions = ["reformat", "test", "type_check"]
+
 
 @nox.session(reuse_venv=True)
 def reformat(session: nox.Session):
@@ -35,3 +37,19 @@ def test(session: nox.Session):
 def type_check(session: nox.Session):
     session.install(".")
     session.run("npx", "pyright", external=True)
+
+
+@nox.session
+def build(session: nox.Session):
+    git_status_output = session.run("git", "status", "--porcelain", external=True, silent=True)
+    if git_status_output != "":
+        session.error("tree is dirty")
+
+    tmpdir = session.create_tmp()
+    session.run("git", "clone", ".", tmpdir, external=True)
+    session.chdir(tmpdir)
+    session.install(
+        "build",
+        "flit-core @ git+https://github.com/layday/flit@fix-pep621-metadata#subdirectory=flit_core",
+    )
+    session.run("python", "-m", "build", "-n")
