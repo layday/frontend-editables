@@ -32,10 +32,10 @@ Basic usage
 
     path_mapping = ...  # Will have been returned by the backend.
     installed_files = frontend_editables.install(
+        [frontend_editables.PthFileInstaller],
         "name",
         sysconfig.get_path("purelib"),
         path_mapping,
-        frontend_editables.EditableStrategy.lax,
     )
     # Then append the ``installed_files`` to the distribution's ``RECORD``,
     # optionally by passing ``append_to_record=<path to RECORD>`` to ``install``.
