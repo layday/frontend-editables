@@ -1,10 +1,10 @@
 from ._core import (
-    BaseEditableInstaller as BaseEditableInstaller,
     EditableDistributionMetadata as EditableDistributionMetadata,
-    EditableStrategy as EditableStrategy,
+    Installer as Installer,
     InstallerOperationError as InstallerOperationError,
+    LaxSymlinkInstaller as LaxSymlinkInstaller,
     PthFileInstaller as PthFileInstaller,
     RedirectorInstaller as RedirectorInstaller,
-    SymlinkInstaller as SymlinkInstaller,
+    StrictSymlinkInstaller as StrictSymlinkInstaller,
     install as install,
 )

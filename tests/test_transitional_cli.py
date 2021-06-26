@@ -44,6 +44,8 @@ def test_self_install_from_path_with_default_settings(test_env_executable):
             test_env_executable,
             "-m",
             "frontend_editables.transitional_cli",
+            "-m",
+            "pth_file",
             "src/frontend_editables",
             "frontend_editables",
         ]
@@ -60,6 +62,8 @@ def test_self_install_from_path_with_spec(test_env_executable):
             test_env_executable,
             "-m",
             "frontend_editables.transitional_cli",
+            "-m",
+            "pth_file",
             "--spec",
             ".[test]",
             "src/frontend_editables",

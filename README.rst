@@ -60,26 +60,21 @@ Editable distributions can be uninstalled with pip as normal.
 
 .. code-block::
 
-    usage: python -m frontend_editables.transitional_cli [-h]
-                                                         [--method {symlink,redirect,pth_file}]
-                                                         [--strategy {lax,strict}]
+    usage: python -m frontend_editables.transitional_cli [-h] --method
+                                                         {lax_symlink,pth_file,redirector,strict_symlink}
                                                          [--spec SPEC]
-                                                         path_pairs
-                                                         [path_pairs ...]
+                                                         path_pairs [path_pairs ...]
 
     Wacky transitional editable project installer.
 
     positional arguments:
-      path_pairs            pairs of path on disk and corresponding path in
-                            the virtual wheel (posix)
+      path_pairs            pairs of path on disk and corresponding path in the
+                            virtual wheel (posix)
 
     optional arguments:
       -h, --help            show this help message and exit
-      --method {symlink,redirect,pth_file}
-                            editable installation method to use (default:
-                            None)
-      --strategy {lax,strict}
-                            editable strategy to follow (default: lax)
+      --method {lax_symlink,pth_file,redirector,strict_symlink}, -m {lax_symlink,pth_file,redirector,strict_symlink}
+                            editable installation method to use (default: None)
       --spec SPEC           requirement specifier (default: .)
 
 Contributing

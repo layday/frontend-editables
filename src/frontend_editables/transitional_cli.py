@@ -9,7 +9,13 @@ import sys
 import tempfile
 import zipfile
 
-from . import BaseEditableInstaller, EditableDistributionMetadata, EditableStrategy, install
+from . import (
+    LaxSymlinkInstaller,
+    PthFileInstaller,
+    RedirectorInstaller,
+    StrictSymlinkInstaller,
+    install,
+)
 
 
 def _slice_pairs(path_map: "Sequence[str]") -> "list[tuple[str, str]]":
@@ -107,6 +113,14 @@ def _pip_info_json() -> "list[dict[str, str]]":
     )
 
 
+_METHODS = {
+    "lax_symlink": LaxSymlinkInstaller,
+    "pth_file": PthFileInstaller,
+    "redirector": RedirectorInstaller,
+    "strict_symlink": StrictSymlinkInstaller,
+}
+
+
 def main(args: "Sequence[str] | None" = None) -> None:
     parser = argparse.ArgumentParser(
         description="Wacky transitional editable project installer.",
@@ -120,15 +134,11 @@ def main(args: "Sequence[str] | None" = None) -> None:
     )
     parser.add_argument(
         "--method",
-        choices=[i.label for i in BaseEditableInstaller.registry],
+        "-m",
+        action="append",
+        choices=_METHODS,
+        required=True,
         help="editable installation method to use",
-    )
-    parser.add_argument(
-        "--strategy",
-        choices=[s.value for s in EditableStrategy],
-        default=EditableStrategy.lax.value,
-        help="editable strategy to follow",
-        type=EditableStrategy,
     )
     parser.add_argument(
         "--spec",
@@ -143,14 +153,6 @@ def main(args: "Sequence[str] | None" = None) -> None:
         for f, t in path_pairs
         for p in _get_paths(os.path.relpath(os.path.normpath(f), os.getcwd()), os.path.normpath(t))
     )
-    editable_metadata: EditableDistributionMetadata = {"paths": paths}
-
-    if parsed_args.method is not None:
-        installer_cls = next(
-            i for i in BaseEditableInstaller.registry if i.label == parsed_args.method
-        )
-    else:
-        installer_cls = None
 
     with tempfile.TemporaryDirectory(prefix="frontend-editables-transitional-cli") as tempdir:
         wheel_path = _pip_build_wheel(tempdir, parsed_args.spec)
@@ -161,11 +163,10 @@ def main(args: "Sequence[str] | None" = None) -> None:
         normalized_distribution = distribution.replace("_", "-")
         package = next(i for i in pip_info if i["name"] == normalized_distribution)
         install(
+            [_METHODS[m] for m in parsed_args.method],
             package["name"],
             package["location"],
-            editable_metadata,
-            parsed_args.strategy,
-            installer_cls,
+            {"paths": paths},
             append_to_record=os.path.join(
                 package["location"], f"{distribution}-{package['version']}.dist-info", "RECORD"
             ),

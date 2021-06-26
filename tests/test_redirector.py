@@ -29,11 +29,10 @@ def test_redirector_paths_are_added_to_record(
 
     with errorcontext:
         frontend_editables.install(
+            [frontend_editables.RedirectorInstaller],
             "test_redirector",
             output_directory,
             dummy_paths,
-            frontend_editables.EditableStrategy.lax,
-            frontend_editables.RedirectorInstaller,
             append_to_record=dummy_dist_info / "RECORD",
         )
         (pth_file,) = output_directory.glob("*.pth")
@@ -50,10 +49,9 @@ def test_redirector_modules_can_be_imported(tmp_path, dummy_paths, path_runner, 
 
     with errorcontext:
         frontend_editables.install(
+            [frontend_editables.RedirectorInstaller],
             "test_redirector",
             output_directory,
             dummy_paths,
-            frontend_editables.EditableStrategy.lax,
-            frontend_editables.RedirectorInstaller,
         )
         path_runner(*dummy_paths["paths"], python_path=output_directory)

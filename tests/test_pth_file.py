@@ -30,11 +30,10 @@ def test_parent_folders_are_listed_in_pth_file(tmp_path, dummy_paths, errorconte
 
     with errorcontext:
         frontend_editables.install(
+            [frontend_editables.PthFileInstaller],
             "test_pth_file",
             output_directory,
             dummy_paths,
-            frontend_editables.EditableStrategy.lax,
-            frontend_editables.PthFileInstaller,
         )
         (pth_file,) = output_directory.glob("*.pth")
         assert pth_file.read_text(encoding="utf-8") == "\n".join(
@@ -59,11 +58,10 @@ def test_pth_file_is_added_to_record(tmp_path, dummy_paths, dummy_dist_info, err
 
     with errorcontext:
         frontend_editables.install(
+            [frontend_editables.PthFileInstaller],
             "test_pth_file",
             output_directory,
             dummy_paths,
-            frontend_editables.EditableStrategy.lax,
-            frontend_editables.PthFileInstaller,
             append_to_record=dummy_dist_info / "RECORD",
         )
         (pth_file,) = output_directory.glob("*.pth")
@@ -80,10 +78,9 @@ def test_pth_file_submodules_can_be_imported(tmp_path, dummy_paths, path_runner,
 
     with errorcontext:
         frontend_editables.install(
+            [frontend_editables.PthFileInstaller],
             "test_pth_file",
             output_directory,
             dummy_paths,
-            frontend_editables.EditableStrategy.lax,
-            frontend_editables.PthFileInstaller,
         )
         path_runner(*dummy_paths["paths"], python_path=output_directory)

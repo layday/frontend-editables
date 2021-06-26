@@ -11,10 +11,10 @@ def test_symlink_lax_strategy_outermost_entities_are_symlinked_successfully(tmp_
     output_directory.mkdir()
 
     frontend_editables.install(
-        "test_symlink",
+        [frontend_editables.LaxSymlinkInstaller],
+        "test_symlink_lax",
         output_directory,
         dummy_paths,
-        frontend_editables.EditableStrategy.lax,
     )
     assert all(
         e.is_symlink() and e.exists() if e.parent == output_directory else not e.is_symlink()
@@ -28,11 +28,10 @@ def test_symlink_strict_strategy_files_are_symlinked_successfully(tmp_path, dumm
     output_directory.mkdir()
 
     frontend_editables.install(
-        "test_symlink",
+        [frontend_editables.StrictSymlinkInstaller],
+        "test_symlink_strict",
         output_directory,
         dummy_paths,
-        frontend_editables.EditableStrategy.strict,
-        frontend_editables.SymlinkInstaller,
     )
     assert all(
         f.is_symlink() and f.is_file() and not f.parent.is_symlink()
@@ -49,11 +48,10 @@ def test_symlink_lax_strategy_outermost_entities_are_added_to_record(
     output_directory.mkdir()
 
     frontend_editables.install(
-        "test_symlink",
+        [frontend_editables.LaxSymlinkInstaller],
+        "test_symlink_lax",
         output_directory,
         dummy_paths,
-        frontend_editables.EditableStrategy.lax,
-        frontend_editables.SymlinkInstaller,
         append_to_record=dummy_dist_info / "RECORD",
     )
     assert (
@@ -73,11 +71,10 @@ def test_symlink_strict_strategy_files_are_added_to_record(tmp_path, dummy_dist_
     output_directory.mkdir()
 
     frontend_editables.install(
-        "test_symlink",
+        [frontend_editables.StrictSymlinkInstaller],
+        "test_symlink_strict",
         output_directory,
         dummy_paths,
-        frontend_editables.EditableStrategy.strict,
-        frontend_editables.SymlinkInstaller,
         append_to_record=dummy_dist_info / "RECORD",
     )
     assert (
@@ -87,16 +84,18 @@ def test_symlink_strict_strategy_files_are_added_to_record(tmp_path, dummy_dist_
     )
 
 
-@pytest.mark.parametrize("strategy", frontend_editables.EditableStrategy)
-def test_symlinks_can_be_imported(tmp_path, dummy_paths, path_runner, strategy):
+@pytest.mark.parametrize(
+    "installers",
+    [[frontend_editables.LaxSymlinkInstaller], [frontend_editables.StrictSymlinkInstaller]],
+)
+def test_symlinks_can_be_imported(tmp_path, dummy_paths, path_runner, installers):
     output_directory = tmp_path / "out"
     output_directory.mkdir()
 
     frontend_editables.install(
+        installers,
         "test_symlink",
         output_directory,
         dummy_paths,
-        strategy,
-        frontend_editables.SymlinkInstaller,
     )
     path_runner(*dummy_paths["paths"], python_path=output_directory)
