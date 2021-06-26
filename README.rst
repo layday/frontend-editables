@@ -1,18 +1,36 @@
 frontend-editables
 ==================
 
-This is a PoC of an editable library which operates on the frontend
-`as discussed <https://discuss.python.org/t/discuss-tbd-editable-installs-by-gaborbernat/9071>`__
-on the Python packaging Discourse.
-It supports installing prospective editable distributions
-using three different methods (symlink, redirector and ``.pth`` files)
-and two strategies (lax and strict).
-The strict strategy reproduces the distribution structure faithfully
-whereas the lax strategy exposes the contents of packages as they appear on disk.
-The input must be a mapping of would-be wheel file paths and absolute paths on disk;
-folder paths are invalid.
-This library does not manipulate data files or scripts because I consider that
-to be an unnecessary complication in the context of editable installation.
+*frontend-editables* is a library for installing Python packages for development,
+originally created as a proof of concept for
+`PEP 662 <https://www.python.org/dev/peps/pep-0662/>`__.
+It supports installing prospective "editable" wheels
+using one of four different methods:
+
+* "Lax" symlinking
+
+  Symlinks *top-level* packages and modules only – the
+  contents of packages can differ from those in the published distribution.
+
+* "Strict" symlinking
+
+  Symlinks *files* only, faithfully mirroring
+  the structure of packages as they would appear in the published distribution.
+
+* Redirector
+
+  Generates a custom module finder which is used to load packages and modules
+  from another location on disk and
+  is injected in the ``sys.meta_path`` on start-up using a dynamic ``.pth`` file.
+  This works similarly to the "lax" symlinking method –
+  for more details, see `editables <https://github.com/pfmoore/editables>`__.
+
+* Static ``.pth`` file
+
+  Creates a ``.pth`` file which lists directories containing the distribution's
+  packages and modules, to add to the Python path.
+  This will expose miscellaneous packages and modules which might be
+  in the same folder.
 
 Installation
 ------------
@@ -40,6 +58,9 @@ Basic usage
     # Then append the ``installed_files`` to the distribution's ``RECORD``,
     # optionally by passing ``append_to_record=<path to RECORD>`` to ``install``.
 
+The paths must map would-be wheel files to their absolute paths on disk;
+folder paths are invalid.
+
 CLI
 ~~~
 
@@ -49,12 +70,13 @@ of ``python -m pip install -e ...``.  The CLI supports all of the same
 layouts and installation methods supported by the library.  Some examples:
 
 * To install a project with a single module ``foo.py``, symlinking it:
-  ``python -m frontend_editables.transitional_cli --strategy strict foo.py foo.py``.
+  ``python -m frontend_editables.transitional_cli -m strict_symlink foo.py foo.py``.
 * To install a project with a package ``foo``, located in ``<project-root>/src/foo``,
   with the aid of a ``pth`` file:
-  ``python -m frontend_editables.transitional_cli --method pth_file src/foo foo``.
-* To install a project with multiple packages at different locations:
-  ``python -m frontend_editables.transitional_cli {src/,}foo {lib/,}bar``
+  ``python -m frontend_editables.transitional_cli -m pth_file src/foo foo``.
+* To install a project with multiple packages at different locations, using the
+  redirecting path finder:
+  ``python -m frontend_editables.transitional_cli -m redirector {src/,}foo {lib/,}bar``
 
 Editable distributions can be uninstalled with pip as normal.
 
