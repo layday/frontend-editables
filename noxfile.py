@@ -9,7 +9,7 @@ nox.options.sessions = ["reformat", "test", "type_check"]
 @nox.session(reuse_venv=True)
 def reformat(session: nox.Session):
     session.install("black", "isort")
-    options = ["--check"] if session.posargs == ["check"] else []
+    options = ["--check"] if session.posargs == ["--check"] else []
     for command in ["isort", "black"]:
         session.run(command, *options, "src", "tests", "noxfile.py")
 
